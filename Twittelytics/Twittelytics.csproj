@@ -104,6 +104,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands\TwitterCommand.cs" />
+    <Compile Include="Common\ParagraphTemplateSelector.cs" />
+    <Compile Include="Common\TweetConverter.cs" />
     <Compile Include="DataModel\TweetItem.cs" />
     <Compile Include="DataModel\TwitterDataCommon.cs" />
     <Compile Include="DataModel\TwitterList.cs" />
@@ -150,6 +152,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Common\CustomStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Common\StandardStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,10 +178,15 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Downloads\LinqToTwitter\Code\LinqToTwitterRT\LinqToTwitterRT.csproj">
+    <ProjectReference Include="..\..\..\GitHub\linqtotwitter\LinqToTwitterRT\LinqToTwitterRT.csproj">
       <Project>{4c99ec2e-067b-48e9-947e-cf80d9e17b96}</Project>
       <Name>LinqToTwitterRT</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="WriteableBitmapEx.WinRT">
+      <HintPath>..\packages\WriteableBitmapEx.1.0.2.0\lib\winrt\WriteableBitmapEx.WinRT.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

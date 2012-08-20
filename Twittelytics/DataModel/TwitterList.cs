@@ -1,9 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.UI;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Twittelytics.DataModel
 {
@@ -21,7 +30,13 @@ namespace Twittelytics.DataModel
         private ObservableCollection<TweetItem> _items = new ObservableCollection<TweetItem>();
         public ObservableCollection<TweetItem> Items
         {
-            get { return this._items; }
+            get {
+                //if (this._items.Count > 0)
+                //{
+                //    CreateCollage();
+                //}
+                return this._items; 
+            }
         }
 
         public IEnumerable<TweetItem> TopItems
@@ -34,6 +49,20 @@ namespace Twittelytics.DataModel
             // A maximum of 12 items are displayed because it results in filled grid columns
             // whether there are 1, 2, 3, 4, or 6 rows displayed
             get { return this._items.Take(12); }
+        }
+
+        private ImageSource _collage;
+        private WriteableBitmap _collageBitmap;
+        public ImageSource Collage
+        {
+            get
+            {
+                return _collage;
+            }
+            set
+            {
+                _collage = value;
+            }
         }
     }
 

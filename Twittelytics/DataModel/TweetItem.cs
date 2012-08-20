@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Twittelytics.DataModel
 {
@@ -26,12 +28,36 @@ namespace Twittelytics.DataModel
             set { this.SetProperty(ref this._content, value); }
         }
 
+        private List<string> _contents = new List<string>();
+
+        public List<string> Contents
+        {
+            get {
+                if (_contents.Count == 0)
+                {
+                    _contents.Add(Content);
+                }
+                return _contents; 
+            }
+            set { _contents = value; }
+        }
+
+
         private TwitterList _group;
         public TwitterList Group
         {
             get { return this._group; }
             set { this.SetProperty(ref this._group, value); }
         }
+
+        private ImageSource _collage;
+
+        public ImageSource Collage
+        {
+            get { return _collage; }
+            set { _collage = value; }
+        }
+
     }
 
 }

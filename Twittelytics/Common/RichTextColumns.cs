@@ -66,8 +66,14 @@ namespace Twittelytics.Common
         /// </summary>
         public RichTextBlock RichTextContent
         {
-            get { return (RichTextBlock)GetValue(RichTextContentProperty); }
-            set { SetValue(RichTextContentProperty, value); }
+            get {
+                RichTextBlock value = (RichTextBlock)GetValue(RichTextContentProperty);
+                return value; 
+            }
+            set
+            {
+                SetValue(RichTextContentProperty, value);
+            }
         }
 
         /// <summary>

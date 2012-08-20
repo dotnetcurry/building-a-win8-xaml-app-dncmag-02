@@ -46,7 +46,6 @@ namespace Twittelytics.Data
 
         public TweetItem LoggedInUser { get; set; }
 
-
         public static IEnumerable<TwitterList> GetGroups(string uniqueId)
         {
             if (!uniqueId.Equals("AllGroups")) throw new ArgumentException("Only 'AllGroups' is supported as a collection of groups");
@@ -58,6 +57,7 @@ namespace Twittelytics.Data
         {
             return _sampleDataSource.LoggedInUser;
         }
+
         public static TwitterList GetGroup(string uniqueId)
         {
             // Simple linear search is acceptable for small data sets
@@ -78,63 +78,6 @@ namespace Twittelytics.Data
             return null;
         }
 
-        private void RefreshTimeLine(TwitterList matches, StatusType type)
-        {
-
-            if (!SuspensionManager.SessionState.ContainsKey("Authorizer"))
-            {
-                IsolatedStorageCredentials cred = new IsolatedStorageCredentials();
-                SuspensionManager.SessionState["SavedAuthorizer"] = cred;
-                try
-                {
-                    PinAuthorizer auth = new PinAuthorizer
-                    {
-                        Credentials = (IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"],
-                        UseCompression = true
-                    };
-                    SuspensionManager.SessionState["Authorizer"] = auth;
-                    auth.ScreenName = cred.ScreenName;
-                    auth.UserId = cred.UserId;
-
-                }
-                catch (Exception ex)
-                {
-                    ((IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
-                }
-            }
-            if(SuspensionManager.SessionState.ContainsKey("Authorizer"))
-            {
-                _auth = SuspensionManager.SessionState["Authorizer"] as PinAuthorizer;
-                if (_auth != null)
-                {
-                    using (var twitterCtx = new TwitterContext(_auth))
-                    {
-                        var timelineResponse =
-                            (from tweet in twitterCtx.Status
-                             where tweet.Type == type &&
-                             tweet.ScreenName == LoggedInUser.Title
-                             select tweet)
-                            .ToList();
-
-                        List<TweetItem> tweets =
-                            (from tweet in timelineResponse
-                             select new TweetItem(tweet.StatusID,
-                                 tweet.User.Name,
-                                 tweet.User.Identifier.ScreenName,
-                                 tweet.User.ProfileImageUrl,
-                                 tweet.Text,
-                                 tweet.Text,
-                                 matches)
-                            ).ToList();
-                        foreach (var item in tweets)
-                        {
-                            matches.Items.Add(item);
-                        }
-                    }
-                }
-            }
-        }
-
         public static TweetItem GetItem(string uniqueId)
         {
             // Simple linear search is acceptable for small data sets
@@ -146,7 +89,6 @@ namespace Twittelytics.Data
         public TwitterDataSource()
         {
             InitGroups();
-
             #region "Hard Coded Stuff"
             //String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
             //            "Curabitur class aliquam vestibulum nam curae maecenas sed integer cras phasellus suspendisse quisque donec dis praesent accumsan bibendum pellentesque condimentum adipiscing etiam consequat vivamus dictumst aliquam duis convallis scelerisque est parturient ullamcorper aliquet fusce suspendisse nunc hac eleifend amet blandit facilisi condimentum commodo scelerisque faucibus aenean ullamcorper ante mauris dignissim consectetuer nullam lorem vestibulum habitant conubia elementum pellentesque morbi facilisis arcu sollicitudin diam cubilia aptent vestibulum auctor eget dapibus pellentesque inceptos leo egestas interdum nulla consectetuer suspendisse adipiscing pellentesque proin lobortis sollicitudin augue elit mus congue fermentum parturient fringilla euismod feugiat");
@@ -445,6 +387,63 @@ namespace Twittelytics.Data
                         this._allGroups.Add(timeline);
                         TwitterList atMentions = new TwitterList("atMentions", "@ Connect", "Your @ Mentions", null, users[0].Status.Text);
                         this._allGroups.Add(atMentions);
+                    }
+                }
+            }
+        }
+
+        private void RefreshTimeLine(TwitterList matches, StatusType type)
+        {
+
+            if (!SuspensionManager.SessionState.ContainsKey("Authorizer"))
+            {
+                IsolatedStorageCredentials cred = new IsolatedStorageCredentials();
+                SuspensionManager.SessionState["SavedAuthorizer"] = cred;
+                try
+                {
+                    PinAuthorizer auth = new PinAuthorizer
+                    {
+                        Credentials = (IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"],
+                        UseCompression = true
+                    };
+                    SuspensionManager.SessionState["Authorizer"] = auth;
+                    auth.ScreenName = cred.ScreenName;
+                    auth.UserId = cred.UserId;
+
+                }
+                catch (Exception ex)
+                {
+                    ((IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
+                }
+            }
+            if (SuspensionManager.SessionState.ContainsKey("Authorizer"))
+            {
+                _auth = SuspensionManager.SessionState["Authorizer"] as PinAuthorizer;
+                if (_auth != null)
+                {
+                    using (var twitterCtx = new TwitterContext(_auth))
+                    {
+                        var timelineResponse =
+                            (from tweet in twitterCtx.Status
+                             where tweet.Type == type &&
+                             tweet.ScreenName == LoggedInUser.Title
+                             select tweet)
+                            .ToList();
+
+                        List<TweetItem> tweets =
+                            (from tweet in timelineResponse
+                             select new TweetItem(tweet.StatusID,
+                                 tweet.User.Name,
+                                 tweet.User.Identifier.ScreenName,
+                                 tweet.User.ProfileImageUrl,
+                                 tweet.Text,
+                                 tweet.Text,
+                                 matches)
+                            ).ToList();
+                        foreach (var item in tweets)
+                        {
+                            matches.Items.Add(item);
+                        }
                     }
                 }
             }

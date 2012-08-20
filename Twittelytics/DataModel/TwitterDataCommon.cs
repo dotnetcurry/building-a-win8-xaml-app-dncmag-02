@@ -56,6 +56,18 @@ namespace Twittelytics.DataModel
 
         private ImageSource _image = null;
         private String _imagePath = null;
+        public String ImagePath
+        {
+            get
+            {
+                return _imagePath;
+            }
+            set
+            {
+                _imagePath = value;
+            }
+        }
+
         public ImageSource Image
         {
             get

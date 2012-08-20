@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twittelytics", "Twittelytics\Twittelytics.csproj", "{DB037C1F-61B5-4ADC-A70B-A3C4EC11D582}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqToTwitterRT", "..\..\..\Downloads\LinqToTwitter\Code\LinqToTwitterRT\LinqToTwitterRT.csproj", "{4C99EC2E-067B-48E9-947E-CF80D9E17B96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqToTwitterRT", "..\..\GitHub\linqtotwitter\LinqToTwitterRT\LinqToTwitterRT.csproj", "{4C99EC2E-067B-48E9-947E-CF80D9E17B96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

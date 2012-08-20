@@ -19,6 +19,15 @@
             x:Name="itemsViewSource"
             Source="{Binding Items}"
             d:Source="{Binding AllGroups[0].Items, Source={d:DesignInstance Type=data:TwitterDataSource, IsDesignTimeCreatable=True}}"/>
+        <common:TweetConverter x:Key="TweetConv"/>
+        <DataTemplate x:Key="DefaultParagraphTemplate">
+            <RichTextBlock>
+                <Paragraph>
+                    <Run Text="{Binding Content, Mode=OneWay, Converter={StaticResource TweetConv}}" Foreground="Red"/>
+                </Paragraph>
+            </RichTextBlock>
+        </DataTemplate>
+        <common:ParagraphTemplateSelector x:Key="ParagraphTemplateSelector" DefaultTemplate="{StaticResource DefaultParagraphTemplate}" />
     </Page.Resources>
 
     <!--
@@ -51,7 +60,7 @@
                 Click="GoBack"
                 IsEnabled="{Binding DefaultViewModel.CanGoBack, ElementName=pageRoot}"
                 Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" Margin="0,0,115,40"/>
+            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" Margin="0,0,0,40"/>
         </Grid>
 
         <!-- Vertical scrolling item list -->
@@ -66,7 +75,7 @@
             ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
             IsSwipeEnabled="False"
             SelectionChanged="ItemListView_SelectionChanged"
-            ItemTemplate="{StaticResource Standard130ItemTemplate}"/>
+            ItemTemplate="{StaticResource Custom130ItemTemplate}"/>
 
         <!-- Details for selected item -->
         <ScrollViewer
@@ -78,29 +87,53 @@
             Padding="20,0,120,0"
             DataContext="{Binding SelectedItem, ElementName=itemListView}"
             d:DataContext="{Binding AllGroups[0].Items[0], Source={d:DesignInstance Type=data:TwitterDataSource, IsDesignTimeCreatable=True}}"
-            Style="{StaticResource VerticalScrollViewerStyle}" Height="628" VerticalAlignment="Stretch">
+            Style="{StaticResource VerticalScrollViewerStyle}" Height="Auto" VerticalAlignment="Stretch">
 
-            <Grid x:Name="itemDetailGrid" Height="593" Width="625">
+            <Grid x:Name="itemDetailGrid" Height="Auto" Width="625">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="95"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Image Margin="0,0,0,0" Height="76" Width="76" Source="{Binding Image}" Stretch="None" Grid.Row="1"/>
-                <StackPanel x:Name="itemDetailTitlePanel" Grid.Row="1" Grid.Column="1">
-                    <TextBlock x:Name="itemTitle" Margin="10,-10,0,0" Text="{Binding Title}" Style="{StaticResource SubheaderTextStyle}"/>
-                    <TextBlock x:Name="itemSubtitle" Margin="10,10,0,20" Text="{Binding Subtitle}" Style="{StaticResource TitleTextStyle}"/>
+                <StackPanel Orientation="Horizontal" >
+                    <Border VerticalAlignment="Top">
+                        <Image Margin="0,0,0,0" Height="76" Width="76" Source="{Binding Image}" Stretch="None" Grid.Row="1"/>
+                    </Border>
+                    <StackPanel x:Name="itemDetailTitlePanel">
+                        <TextBlock x:Name="itemTitle" Text="{Binding Title}" Style="{StaticResource SubheaderTextStyle}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="itemAt"  Text="@" Style="{StaticResource CustomTwitterUserTextStyle}"/>
+                            <TextBlock x:Name="itemSubtitle" Text="{Binding Subtitle}" Style="{StaticResource CustomTwitterUserTextStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
                 <Grid Grid.ColumnSpan="2" Margin="0,20,0,0" Grid.Row="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="0*"/>
+                        <ColumnDefinition Width="*" />
+
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Content}" Style="{StaticResource BodyTextStyle}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel>
+                        <StackPanel.Resources>
+
+                        </StackPanel.Resources>
+                        <ListView CanDragItems="False"
+                                  CanReorderItems="False"
+                                  Height="Auto"
+                                  SelectionMode="None"
+                                  AllowDrop="False"
+                                  IsActiveView="False"
+                                  IsTabStop="True"
+                                  ItemsSource="{Binding Contents}"  
+                                              ItemTemplateSelector="{StaticResource ParagraphTemplateSelector}" />
+
+
+                    </StackPanel>
                 </Grid>
             </Grid>
         </ScrollViewer>
@@ -110,7 +143,7 @@
         	Grid.Column="1" Width="100" Margin="10,46,0,10" Click="sendTweet_Click"/>
         <Button
         	x:Name="replyTweet"
-        	Style="{StaticResource AddAppBarButtonStyle}" 
+        	Style="{StaticResource ReplyTweetButtonStyle}" 
         	Grid.Column="1" Width="100" Margin="110,46,0,10" Click="replyTweet_Click"/>
 
         <VisualStateManager.VisualStateGroups>
@@ -126,7 +159,7 @@
                             <DiscreteObjectKeyFrame KeyTime="0" Value="420"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemListView" Storyboard.TargetProperty="ItemTemplate">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Standard80ItemTemplate}"/>
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Custom80ItemTemplate}"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="itemDetail" Storyboard.TargetProperty="Padding">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="60,0,66,0"/>
