@@ -55,7 +55,7 @@ namespace Twittelytics.Common
                 }
                 else
                 {
-                    builder.AppendLine("<Run Text = '" +  token.Replace("'", " ") + "' />");
+                    builder.AppendLine("<Run Text = '" +  System.Net.WebUtility.HtmlEncode(token) + "' />");
                 }
             }
             return builder.ToString();
@@ -76,7 +76,7 @@ namespace Twittelytics.Common
             StringBuilder container = new StringBuilder("<InlineUIContainer>");
             container.AppendLine("<HyperlinkButton Margin='-14,0,-14,-14'");
             container.Append("Content= '" + token + "' ");
-            container.Append("NavigateUri='" + "http://www.twitter.com/#!/search/?q=" + token + "&amp;src=hash' />");
+            container.Append("NavigateUri='" + "http://www.twitter.com/#!/search/?q=" + System.Net.WebUtility.UrlEncode(token) + "&amp;src=hash' />");
             container.AppendLine("</InlineUIContainer>");
             return container.ToString();
         }

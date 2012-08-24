@@ -1,18 +1,21 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Windows.ApplicationModel.Resources.Core;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using LinqToTwitter;
+using Twittelytics.Common;
+using Twittelytics.DataModel;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml.Data;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.UI;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Twittelytics.DataModel;
-using Twittelytics.Common;
-using LinqToTwitter;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model that supports notification when members are added, removed, or modified.  The property
@@ -30,7 +33,9 @@ namespace Twittelytics.Data
     {
         private static TwitterDataSource _sampleDataSource = new TwitterDataSource();
         private ObservableCollection<TwitterList> _allGroups = new ObservableCollection<TwitterList>();
+        private Dictionary<string, ImageSource> _imageCache = new Dictionary<string, ImageSource>();
         private PinAuthorizer _auth;
+        private DispatcherTimer _timer;
 
         public ObservableCollection<TwitterList> AllGroups
         {
@@ -41,6 +46,8 @@ namespace Twittelytics.Data
                     _sampleDataSource.InitGroups();
                 }
                 return this._allGroups;
+
+                return _sampleDataSource._allGroups;
             }
         }
 
@@ -49,7 +56,11 @@ namespace Twittelytics.Data
         public static IEnumerable<TwitterList> GetGroups(string uniqueId)
         {
             if (!uniqueId.Equals("AllGroups")) throw new ArgumentException("Only 'AllGroups' is supported as a collection of groups");
-
+            if (!_sampleDataSource._timer.IsEnabled)
+            {
+                _sampleDataSource.Refresh();
+                _sampleDataSource._timer.Start();
+            }
             return _sampleDataSource.AllGroups;
         }
 
@@ -63,18 +74,9 @@ namespace Twittelytics.Data
             // Simple linear search is acceptable for small data sets
             var matches = _sampleDataSource.AllGroups.Where((group) => group.UniqueId.Equals(uniqueId)).ToList<TwitterList>();
 
-            if (matches.Count > 0)
-            {
-                if (uniqueId == "timeline")
-                {
-                    _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Home);
-                }
-                else if (uniqueId == "atMentions")
-                {
-                    _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Mentions);
-                }
-                if (matches.Count() == 1) return matches.First();
-            }
+
+            if (matches.Count() == 1) return matches.First();
+
             return null;
         }
 
@@ -88,283 +90,15 @@ namespace Twittelytics.Data
 
         public TwitterDataSource()
         {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 30);
+            _timer.Tick += _timer_Tick;
             InitGroups();
-            #region "Hard Coded Stuff"
-            //String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
-            //            "Curabitur class aliquam vestibulum nam curae maecenas sed integer cras phasellus suspendisse quisque donec dis praesent accumsan bibendum pellentesque condimentum adipiscing etiam consequat vivamus dictumst aliquam duis convallis scelerisque est parturient ullamcorper aliquet fusce suspendisse nunc hac eleifend amet blandit facilisi condimentum commodo scelerisque faucibus aenean ullamcorper ante mauris dignissim consectetuer nullam lorem vestibulum habitant conubia elementum pellentesque morbi facilisis arcu sollicitudin diam cubilia aptent vestibulum auctor eget dapibus pellentesque inceptos leo egestas interdum nulla consectetuer suspendisse adipiscing pellentesque proin lobortis sollicitudin augue elit mus congue fermentum parturient fringilla euismod feugiat");
-            //var group1 = new TwitterList("Group-1",
-            //        "Group Title: 1",
-            //        "Group Subtitle: 1",
-            //        "Assets/DarkGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group1.Items.Add(new TweetItem("Group-1-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group1));
-            //group1.Items.Add(new TweetItem("Group-1-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group1));
-            //group1.Items.Add(new TweetItem("Group-1-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group1));
-            //group1.Items.Add(new TweetItem("Group-1-Item-4",
-            //        "Item Title: 4",
-            //        "Item Subtitle: 4",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group1));
-            //group1.Items.Add(new TweetItem("Group-1-Item-5",
-            //        "Item Title: 5",
-            //        "Item Subtitle: 5",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group1));
-            //this.AllGroups.Add(group1);
+        }
 
-            //var group2 = new TwitterList("Group-2",
-            //        "Group Title: 2",
-            //        "Group Subtitle: 2",
-            //        "Assets/LightGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group2.Items.Add(new TweetItem("Group-2-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group2));
-            //group2.Items.Add(new TweetItem("Group-2-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group2));
-            //group2.Items.Add(new TweetItem("Group-2-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group2));
-            //this.AllGroups.Add(group2);
-
-            //var group3 = new TwitterList("Group-3",
-            //        "Group Title: 3",
-            //        "Group Subtitle: 3",
-            //        "Assets/MediumGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group3.Items.Add(new TweetItem("Group-3-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-4",
-            //        "Item Title: 4",
-            //        "Item Subtitle: 4",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-5",
-            //        "Item Title: 5",
-            //        "Item Subtitle: 5",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-6",
-            //        "Item Title: 6",
-            //        "Item Subtitle: 6",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //group3.Items.Add(new TweetItem("Group-3-Item-7",
-            //        "Item Title: 7",
-            //        "Item Subtitle: 7",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group3));
-            //this.AllGroups.Add(group3);
-
-            //var group4 = new TwitterList("Group-4",
-            //        "Group Title: 4",
-            //        "Group Subtitle: 4",
-            //        "Assets/LightGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group4.Items.Add(new TweetItem("Group-4-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //group4.Items.Add(new TweetItem("Group-4-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //group4.Items.Add(new TweetItem("Group-4-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //group4.Items.Add(new TweetItem("Group-4-Item-4",
-            //        "Item Title: 4",
-            //        "Item Subtitle: 4",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //group4.Items.Add(new TweetItem("Group-4-Item-5",
-            //        "Item Title: 5",
-            //        "Item Subtitle: 5",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //group4.Items.Add(new TweetItem("Group-4-Item-6",
-            //        "Item Title: 6",
-            //        "Item Subtitle: 6",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group4));
-            //this.AllGroups.Add(group4);
-
-            //var group5 = new TwitterList("Group-5",
-            //        "Group Title: 5",
-            //        "Group Subtitle: 5",
-            //        "Assets/MediumGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group5.Items.Add(new TweetItem("Group-5-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group5));
-            //group5.Items.Add(new TweetItem("Group-5-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group5));
-            //group5.Items.Add(new TweetItem("Group-5-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group5));
-            //group5.Items.Add(new TweetItem("Group-5-Item-4",
-            //        "Item Title: 4",
-            //        "Item Subtitle: 4",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group5));
-            //this.AllGroups.Add(group5);
-
-            //var group6 = new TwitterList("Group-6",
-            //        "Group Title: 6",
-            //        "Group Subtitle: 6",
-            //        "Assets/DarkGray.png",
-            //        "Group Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor scelerisque lorem in vehicula. Aliquam tincidunt, lacus ut sagittis tristique, turpis massa volutpat augue, eu rutrum ligula ante a ante");
-            //group6.Items.Add(new TweetItem("Group-6-Item-1",
-            //        "Item Title: 1",
-            //        "Item Subtitle: 1",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-2",
-            //        "Item Title: 2",
-            //        "Item Subtitle: 2",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-3",
-            //        "Item Title: 3",
-            //        "Item Subtitle: 3",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-4",
-            //        "Item Title: 4",
-            //        "Item Subtitle: 4",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-5",
-            //        "Item Title: 5",
-            //        "Item Subtitle: 5",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-6",
-            //        "Item Title: 6",
-            //        "Item Subtitle: 6",
-            //        "Assets/MediumGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-7",
-            //        "Item Title: 7",
-            //        "Item Subtitle: 7",
-            //        "Assets/DarkGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //group6.Items.Add(new TweetItem("Group-6-Item-8",
-            //        "Item Title: 8",
-            //        "Item Subtitle: 8",
-            //        "Assets/LightGray.png",
-            //        "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
-            //        ITEM_CONTENT,
-            //        group6));
-            //this.AllGroups.Add(group6);
-            #endregion
+        void _timer_Tick(object sender, object e)
+        {
+            Refresh();
         }
 
         private void InitGroups()
@@ -390,36 +124,41 @@ namespace Twittelytics.Data
                     }
                 }
             }
-        }
-
-        private void RefreshTimeLine(TwitterList matches, StatusType type)
-        {
-
-            if (!SuspensionManager.SessionState.ContainsKey("Authorizer"))
+            else if (!SuspensionManager.SessionState.ContainsKey("Authorizer"))
             {
-                IsolatedStorageCredentials cred = new IsolatedStorageCredentials();
-                SuspensionManager.SessionState["SavedAuthorizer"] = cred;
-                try
+                LocalDataCredentials cred = new LocalDataCredentials();
+                if (cred.ToString() != ",,,,,")
                 {
-                    PinAuthorizer auth = new PinAuthorizer
+                    SuspensionManager.SessionState["SavedAuthorizer"] = cred;
+                    try
                     {
-                        Credentials = (IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"],
-                        UseCompression = true
-                    };
-                    SuspensionManager.SessionState["Authorizer"] = auth;
-                    auth.ScreenName = cred.ScreenName;
-                    auth.UserId = cred.UserId;
+                        PinAuthorizer auth = new PinAuthorizer
+                        {
+                            Credentials = (LocalDataCredentials)SuspensionManager.SessionState["SavedAuthorizer"],
+                            UseCompression = true
+                        };
+                        SuspensionManager.SessionState["Authorizer"] = auth;
+                        auth.ScreenName = cred.ScreenName;
+                        auth.UserId = cred.UserId;
 
-                }
-                catch (Exception ex)
-                {
-                    ((IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        ((LocalDataCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
+                    }
                 }
             }
+        }
+
+        private async void RefreshTimeLine(TwitterList matches, StatusType type)
+        {
             if (SuspensionManager.SessionState.ContainsKey("Authorizer"))
             {
                 _auth = SuspensionManager.SessionState["Authorizer"] as PinAuthorizer;
-                if (_auth != null)
+            }
+            if (_auth != null)
+            {
+                try
                 {
                     using (var twitterCtx = new TwitterContext(_auth))
                     {
@@ -430,7 +169,7 @@ namespace Twittelytics.Data
                              select tweet)
                             .ToList();
 
-                        List<TweetItem> tweets =
+                        IEnumerable<TweetItem> tweets =
                             (from tweet in timelineResponse
                              select new TweetItem(tweet.StatusID,
                                  tweet.User.Name,
@@ -439,12 +178,22 @@ namespace Twittelytics.Data
                                  tweet.Text,
                                  tweet.Text,
                                  matches)
-                            ).ToList();
-                        foreach (var item in tweets)
+                            );
+                        if (tweets.Count<TweetItem>() > 0)
                         {
-                            matches.Items.Add(item);
+                            IEnumerable<TweetItem> results = matches.Items.Union<TweetItem>(tweets, new UniqueIdCompararer()).OrderByDescending<TweetItem, string>(k => k.UniqueId);//.ToList<TweetItem>();
+                            matches.Items.Clear();
+                            foreach (var item in results)
+                            {
+                                matches.Items.Add(item);
+                            }
                         }
                     }
+                    await CreateCollage();
+                }
+                catch (LitJson.JsonException je)
+                {
+                    //TODO: Log the Json Exception and move on.
                 }
             }
         }
@@ -453,6 +202,139 @@ namespace Twittelytics.Data
         {
             _sampleDataSource.AllGroups.Clear();
             _sampleDataSource.LoggedInUser = null;
+        }
+
+        internal static void Retweet(TweetItem selectedItem)
+        {
+            if (_sampleDataSource._auth == null)
+            {
+                _sampleDataSource.InitGroups();
+            }
+            using (var twitterCtx = new TwitterContext(_sampleDataSource._auth))
+            {
+                Status response = twitterCtx.Retweet(selectedItem.UniqueId);
+            }
+        }
+
+        internal static void Favorite(TweetItem selectedItem)
+        {
+            if (_sampleDataSource._auth == null)
+            {
+                _sampleDataSource.InitGroups();
+            }
+            using (var twitterCtx = new TwitterContext(_sampleDataSource._auth))
+            {
+                Status response = twitterCtx.CreateFavorite(selectedItem.UniqueId);
+            }
+        }
+
+
+        async Task CreateCollage()
+        {
+            var sampleDataGroups = this._allGroups;
+            if (sampleDataGroups.Count() > 0 && sampleDataGroups.ToList()[0].TopItems.Count() == 0) return;
+            List<TwitterList> list = sampleDataGroups.ToList();
+
+            foreach (var currentList in list)
+            {
+                try
+                {
+                    IEnumerable<TweetItem> topItems = currentList.TopItems;
+
+                    List<Uri> uris = (from tweetItem in topItems
+                                      select ((BitmapImage)tweetItem.Image).UriSource).ToList<Uri>();
+
+                    if (uris.Count > 0)
+                    {
+                        int number = (int)Math.Ceiling(Math.Sqrt((double)uris.Count));
+                        WriteableBitmap destination = new WriteableBitmap(48 * number, 48 * number);
+                        int col = 0;
+                        int row = 0;
+                        destination.Clear(Colors.Transparent);
+                        WriteableBitmap bitmap;
+                        foreach (var uri1 in uris)
+                        {
+                            RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri1);
+                            int wid = 0;
+                            int hgt = 0;
+                            byte[] srcPixels;
+                            using (IRandomAccessStreamWithContentType fileStream = await streamRef.OpenReadAsync())
+                            {
+                                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fileStream);
+                                BitmapFrame frame = await decoder.GetFrameAsync(0);
+
+                                // I know the parameterless version of GetPixelDataAsync works for this image
+                                PixelDataProvider pixelProvider = await frame.GetPixelDataAsync();
+                                srcPixels = pixelProvider.DetachPixelData();
+
+                                // Create the WriteableBitmap
+                                wid = (int)frame.PixelWidth;
+                                hgt = (int)frame.PixelHeight;
+                                bitmap = new WriteableBitmap(wid, hgt);
+                            }
+
+                            //// Set the bitmap to the Image element
+                            Stream pixelStream1 = bitmap.PixelBuffer.AsStream();
+
+                            pixelStream1.Seek(0, SeekOrigin.Begin);
+                            pixelStream1.Write(srcPixels, 0, (int)srcPixels.Length);
+                            bitmap.Invalidate();
+
+                            if (row < number)
+                            {
+                                destination.Blit(new Rect(col * wid, row * hgt, wid, hgt), bitmap, new Rect(0, 0, wid, hgt));
+                                col++;
+                                if (col >= number)
+                                {
+                                    row++;
+                                    col = 0;
+                                }
+                            }
+                        }
+                        currentList.Image = destination;
+                        ((WriteableBitmap)currentList.Image).Invalidate();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Log Error, unable to render image
+                }
+            }
+        }
+
+
+        internal void Refresh()
+        {
+            CoreDispatcher dispatcher = Window.Current.Dispatcher;
+            Parallel.ForEach(_sampleDataSource.AllGroups, item =>
+            {
+                dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                {
+                    var matches = _sampleDataSource.AllGroups.Where((group) => group.UniqueId.Equals(item.UniqueId)).ToList<TwitterList>();
+                    if (matches.Count > 0)
+                    {
+                        if (item.UniqueId == "timeline")
+                        {
+                            _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Home);
+                        }
+                        else if (item.UniqueId == "atMentions")
+                        {
+                            _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Mentions);
+                        }
+                    }
+                });
+            });
+            if (!_timer.IsEnabled)
+            {
+                _timer.Start();
+            }
+
+            //foreach (var item in _sampleDataSource.AllGroups)
+            //{
+
+            //}
+
         }
     }
 }

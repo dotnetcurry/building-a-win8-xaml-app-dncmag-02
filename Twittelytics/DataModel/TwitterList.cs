@@ -51,19 +51,6 @@ namespace Twittelytics.DataModel
             get { return this._items.Take(12); }
         }
 
-        private ImageSource _collage;
-        private WriteableBitmap _collageBitmap;
-        public ImageSource Collage
-        {
-            get
-            {
-                return _collage;
-            }
-            set
-            {
-                _collage = value;
-            }
-        }
     }
 
 

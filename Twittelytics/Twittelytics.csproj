@@ -104,8 +104,10 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands\TwitterCommand.cs" />
+    <Compile Include="Common\BackgroundTimer.cs" />
     <Compile Include="Common\ParagraphTemplateSelector.cs" />
     <Compile Include="Common\TweetConverter.cs" />
+    <Compile Include="DataModel\ImageCache.cs" />
     <Compile Include="DataModel\TweetItem.cs" />
     <Compile Include="DataModel\TwitterDataCommon.cs" />
     <Compile Include="DataModel\TwitterList.cs" />
@@ -135,6 +137,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Common\ReadMe.txt" />
+    <None Include="DataModel\TwittelyticsViewModel.cd" />
     <None Include="packages.config" />
     <None Include="Twittelytics_TemporaryKey.pfx" />
   </ItemGroup>
@@ -178,12 +181,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\GitHub\linqtotwitter\LinqToTwitterRT\LinqToTwitterRT.csproj">
-      <Project>{4c99ec2e-067b-48e9-947e-cf80d9e17b96}</Project>
-      <Name>LinqToTwitterRT</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Reference Include="LinqToTwitterRT, Version=2.0.28.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\linqtotwitter.2.0.29\lib\winrt45\LinqToTwitterRT.dll</HintPath>
+    </Reference>
     <Reference Include="WriteableBitmapEx.WinRT">
       <HintPath>..\packages\WriteableBitmapEx.1.0.2.0\lib\winrt\WriteableBitmapEx.WinRT.dll</HintPath>
     </Reference>

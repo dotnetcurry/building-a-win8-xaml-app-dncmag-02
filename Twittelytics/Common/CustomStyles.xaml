@@ -10,7 +10,7 @@
     <DataTemplate x:Key="Custom250x250ItemTemplate">
         <Grid HorizontalAlignment="Left" Width="250" Height="250">
             <Border Background="{StaticResource ListViewItemPlaceholderBackgroundThemeBrush}">
-                <Image Source="{Binding Collage}" Stretch="UniformToFill"/>
+                <Image Source="{Binding Image}" Stretch="UniformToFill"/>
             </Border>
             <StackPanel VerticalAlignment="Bottom" Background="{StaticResource ListViewItemOverlayBackgroundThemeBrush}">
                 <TextBlock Text="{Binding Title}" Foreground="{StaticResource ListViewItemOverlayForegroundThemeBrush}" 
@@ -75,6 +75,12 @@
         <Setter Property="FontSize" Value="12"></Setter>
     </Style>
 
+    <Style x:Key="NewTweetButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
+        <Setter Property="AutomationProperties.AutomationId" Value="NewTweetButton"/>
+        <Setter Property="AutomationProperties.Name" Value="New Tweet"/>
+        <Setter Property="Content" Value="&#xE200;"/>
+    </Style>
+
     <Style x:Key="ReplyTweetButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
         <Setter Property="AutomationProperties.AutomationId" Value="ReplyTweetButton"/>
         <Setter Property="AutomationProperties.Name" Value="Reply"/>
@@ -82,9 +88,15 @@
     </Style>
 
     <Style x:Key="ReTweetButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
-        <Setter Property="AutomationProperties.AutomationId" Value="ReplyTweetButton"/>
-        <Setter Property="AutomationProperties.Name" Value="Reply"/>
+        <Setter Property="AutomationProperties.AutomationId" Value="ReTweetButton"/>
+        <Setter Property="AutomationProperties.Name" Value="Retweet"/>
         <Setter Property="Content" Value="&#xE1CA;"/>
+    </Style>
+
+    <Style x:Key="FavoriteTweetButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
+        <Setter Property="AutomationProperties.AutomationId" Value="FavoriteTweetButton"/>
+        <Setter Property="AutomationProperties.Name" Value="Favorite"/>
+        <Setter Property="Content" Value="&#xE1CE;"/>
     </Style>
 </ResourceDictionary>
     

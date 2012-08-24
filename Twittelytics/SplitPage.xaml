@@ -19,7 +19,6 @@
             x:Name="itemsViewSource"
             Source="{Binding Items}"
             d:Source="{Binding AllGroups[0].Items, Source={d:DesignInstance Type=data:TwitterDataSource, IsDesignTimeCreatable=True}}"/>
-        <common:TweetConverter x:Key="TweetConv"/>
         <DataTemplate x:Key="DefaultParagraphTemplate">
             <RichTextBlock>
                 <Paragraph>
@@ -139,12 +138,20 @@
         </ScrollViewer>
         <Button
         	x:Name="sendTweet"
-        	Style="{StaticResource AddAppBarButtonStyle}" 
+        	Style="{StaticResource NewTweetButtonStyle}" 
         	Grid.Column="1" Width="100" Margin="10,46,0,10" Click="sendTweet_Click"/>
         <Button
         	x:Name="replyTweet"
         	Style="{StaticResource ReplyTweetButtonStyle}" 
-        	Grid.Column="1" Width="100" Margin="110,46,0,10" Click="replyTweet_Click"/>
+        	Grid.Column="1" Width="100" Margin="115,46,0,10" Click="replyTweet_Click"/>
+        <Button
+        	x:Name="reTweet"
+        	Style="{StaticResource ReTweetButtonStyle}" 
+        	Grid.Column="1" Width="100" Margin="220,46,0,10" Click="reTweet_Click"/>
+        <Button
+        	x:Name="favorite"
+        	Style="{StaticResource FavoriteTweetButtonStyle}" 
+        	Grid.Column="1" Width="100" Margin="325,46,0,10" Click="favorite_Click"  />
 
         <VisualStateManager.VisualStateGroups>
 

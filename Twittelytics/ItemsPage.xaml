@@ -132,9 +132,7 @@
                 </StackPanel>
                 <StackPanel x:Name="RightPanel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
                     <Button x:Name="Refresh" Style="{StaticResource RefreshAppBarButtonStyle}" Tag="Refresh"/>
-                    <Button x:Name="Previous" Style="{StaticResource PreviousAppBarButtonStyle}" Tag="Previous"/>
-                    <Button x:Name="Next" Style="{StaticResource NextAppBarButtonStyle}" Tag="Next"/>
-                    <Button x:Name="Help" Style="{StaticResource HelpAppBarButtonStyle}" Tag="Help"/>
+                    <Button x:Name="NewTweet" Style="{StaticResource NewTweetButtonStyle}" Tag="Previous"/>
                 </StackPanel>
             </Grid>
         </AppBar>

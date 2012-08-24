@@ -204,5 +204,17 @@ namespace Twittelytics
             var selectedItem = (TweetItem)this.itemsViewSource.View.CurrentItem;
             this.Frame.Navigate(typeof(SendUpdate), selectedItem);
         }
+
+        private void reTweet_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (TweetItem)this.itemsViewSource.View.CurrentItem;
+            TwitterDataSource.Retweet(selectedItem);
+        }
+
+        private void favorite_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (TweetItem)this.itemsViewSource.View.CurrentItem;
+            TwitterDataSource.Favorite(selectedItem);
+        }
     }
 }

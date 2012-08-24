@@ -50,14 +50,19 @@ namespace Twittelytics.DataModel
             set { this.SetProperty(ref this._group, value); }
         }
 
-        private ImageSource _collage;
+    }
 
-        public ImageSource Collage
+    public class UniqueIdCompararer : IEqualityComparer<TweetItem>
+    {
+        public bool Equals(TweetItem x, TweetItem y)
         {
-            get { return _collage; }
-            set { _collage = value; }
+            return x.UniqueId == y.UniqueId;
         }
 
+        public int GetHashCode(TweetItem obj)
+        {
+            return obj.UniqueId.GetHashCode();
+        }
     }
 
 }

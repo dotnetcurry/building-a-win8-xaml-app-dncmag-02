@@ -63,10 +63,14 @@ namespace Twittelytics
                 await SuspensionManager.RestoreAsync();
             }
 
-            IsolatedStorageCredentials cred = new IsolatedStorageCredentials();
+            LocalDataCredentials cred = new LocalDataCredentials();
             if (cred.ToString() != ",,,,,")
             {
                 SuspensionManager.SessionState["SavedAuthorizer"] = cred;
+            }
+            else
+            {
+                SuspensionManager.SessionState.Remove("SavedAuthorizer");
             }
 
 

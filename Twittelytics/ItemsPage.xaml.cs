@@ -43,7 +43,6 @@ namespace Twittelytics
             this.InitializeComponent();
         }
 
-
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
         /// provided when recreating a page from a prior session.
@@ -65,67 +64,6 @@ namespace Twittelytics
             BindUserData("AllGroups");
         }
 
-
-        async private void CreateCollage()
-        {
-            var sampleDataGroups = TwitterDataSource.GetGroups("AllGroups");
-            if (sampleDataGroups.Count() > 0 && sampleDataGroups.ToList()[0].TopItems.Count() == 0) return;
-
-            TwitterList currentList = sampleDataGroups.ToList()[0];
-
-            IEnumerable<TweetItem> topItems = sampleDataGroups.ToList()[0].TopItems;
-
-            List<Uri> uris = (from tweetItem in topItems
-                                      select ((BitmapImage)tweetItem.Image).UriSource).ToList<Uri>();
-
-            int number = (int)Math.Ceiling(Math.Sqrt((double)uris.Count));
-            WriteableBitmap destination = new WriteableBitmap(48 * number, 48 * number);
-            int col = 0;
-            int row = 0;
-            destination.Clear(Colors.Transparent);
-            WriteableBitmap bitmap;
-            foreach (var uri1 in uris)
-            {
-                RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri1);
-                int wid = 0;
-                int hgt = 0;
-                byte[] srcPixels;
-                using (IRandomAccessStreamWithContentType fileStream = await streamRef.OpenReadAsync())
-                {
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fileStream);
-                    BitmapFrame frame = await decoder.GetFrameAsync(0);
-
-                    // I know the parameterless version of GetPixelDataAsync works for this image
-                    PixelDataProvider pixelProvider = await frame.GetPixelDataAsync();
-                    srcPixels = pixelProvider.DetachPixelData();
-
-                    // Create the WriteableBitmap
-                    wid = (int)frame.PixelWidth;
-                    hgt = (int)frame.PixelHeight;
-                    bitmap = new WriteableBitmap(wid, hgt);
-                }
-
-                //// Set the bitmap to the Image element
-                Stream pixelStream1 = bitmap.PixelBuffer.AsStream();
-
-                pixelStream1.Seek(0, SeekOrigin.Begin);
-                pixelStream1.Write(srcPixels, 0, (int)srcPixels.Length);
-                bitmap.Invalidate();
-
-                if (row < number)
-                {
-                    destination.Blit(new Rect(col * wid, row * hgt, wid, hgt), bitmap, new Rect(0, 0, wid, hgt));
-                    col++;
-                    if (col >= number)
-                    {
-                        row++;
-                        col = 0;
-                    }
-                }
-            }
-            currentList.Collage = destination;
-            ((WriteableBitmap)currentList.Collage).Invalidate();
-        }
         /// <summary>
         /// Invoked when an item is clicked.
         /// </summary>
@@ -168,7 +106,8 @@ namespace Twittelytics
                     var sampleDataGroups = TwitterDataSource.GetGroups(navigationParameter);
                     userImage.Source = TwitterDataSource.GetCurrentUser().Image;
                     this.DefaultViewModel["Items"] = sampleDataGroups;
-                    CreateCollage();
+                    //CreateCollage();
+
                 }
                 else
                 {
@@ -178,12 +117,12 @@ namespace Twittelytics
                     userIdText.Text = "";
                     userName.Text = "Log in";
                     this.DefaultViewModel["Items"] = sampleDataGroups;
-                    CreateCollage();
+                    //CreateCollage();
                 }
             }
             catch (NullReferenceException ex)
             {
-                //((IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
+                //((LocalDataCredentials)SuspensionManager.SessionState["SavedAuthorizer"]).Clear();
             }
 
         }
@@ -226,7 +165,7 @@ namespace Twittelytics
 
         private void Logout()
         {
-            IsolatedStorageCredentials cred = (IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"];
+            LocalDataCredentials cred = (LocalDataCredentials)SuspensionManager.SessionState["SavedAuthorizer"];
             cred.Clear();
             cred = null;
             SuspensionManager.SessionState["SavedAuthorizer"] = null;
@@ -246,7 +185,7 @@ namespace Twittelytics
             else if (SuspensionManager.SessionState.ContainsKey("SavedAuthorizer") &&
                 SuspensionManager.SessionState["SavedAuthorizer"] != null)
             {
-                IsolatedStorageCredentials cred = (IsolatedStorageCredentials)SuspensionManager.SessionState["SavedAuthorizer"];
+                LocalDataCredentials cred = (LocalDataCredentials)SuspensionManager.SessionState["SavedAuthorizer"];
                 auth = new PinAuthorizer
                 {
                     Credentials = cred,
@@ -267,5 +206,6 @@ namespace Twittelytics
         {
             NavigateToLogin();
         }
+
     }
 }

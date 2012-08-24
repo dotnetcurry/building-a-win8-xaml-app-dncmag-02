@@ -49,10 +49,10 @@ namespace Twittelytics
             {
                 Credentials = new InMemoryCredentials
                 {
-                    ConsumerKey = "<Replace your key from dev.Twitter.com here>",
-                    ConsumerSecret = "<Replace your secret from dev.Twitter.com key here>"
+                    ConsumerKey = "f3AsSTIvM8JkQji4eM74A",
+                    ConsumerSecret = "Ahxwgbg9Su5Xbc6uFeRvkHxWhwNBqXXGcuof1U2XN4"
                 },
-                UseCompression = true,
+                UseCompression = true, 
                 GoToTwitterAuthorization = pageLink =>
                     Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                         () => OAuthWebBrowser.Navigate(new Uri(pageLink, UriKind.Absolute))).AsTask().Wait()
@@ -122,7 +122,7 @@ namespace Twittelytics
             auth.UserId = completeResp.State.UserID;
             auth.ScreenName = completeResp.State.ScreenName;
             SuspensionManager.SessionState["Authorizer"] = auth;
-            IsolatedStorageCredentials cred = new IsolatedStorageCredentials
+            LocalDataCredentials cred = new LocalDataCredentials
                 {
                     AccessToken = auth.Credentials.AccessToken,
                     ConsumerKey = auth.Credentials.ConsumerKey,

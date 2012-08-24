@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Twittelytics.Data.TwitterDataSource">
+    <Position X="0.75" Y="2.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABgAGQAAAMAgAAAAAEAAAAMACCgAABgAEA=</HashCode>
+      <FileName>DataModel\TwitterDataSource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="LoggedInUser" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Twittelytics.DataModel.TwitterDataCommon">
+    <Position X="5" Y="1.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAgAEQEQAAAAIUIAAAAQBAAAAAAAAAARAA=</HashCode>
+      <FileName>DataModel\TwitterDataCommon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Twittelytics.DataModel.TweetItem" Collapsed="true">
+    <Position X="3.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAgAAAAAFEAAAAAAAAAAAAAABAAAAAABAAAA=</HashCode>
+      <FileName>DataModel\TweetItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Twittelytics.DataModel.UniqueIdCompararer" Collapsed="true">
+    <Position X="3.25" Y="4.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataModel\TweetItem.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Twittelytics.DataModel.TwitterList" Collapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAEEAQAAAAAABAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>DataModel\TwitterList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Twittelytics.Common.BindableBase" Collapsed="true">
+    <Position X="5" Y="0.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\BindableBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
