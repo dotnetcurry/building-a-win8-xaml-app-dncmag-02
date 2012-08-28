@@ -103,10 +103,11 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\TwitterAuthorizePinCommand.cs" />
     <Compile Include="Commands\TwitterCommand.cs" />
     <Compile Include="Common\BackgroundTimer.cs" />
     <Compile Include="Common\ParagraphTemplateSelector.cs" />
-    <Compile Include="Common\TweetConverter.cs" />
+    <Compile Include="Common\StringFormatConverter.cs" />
     <Compile Include="DataModel\ImageCache.cs" />
     <Compile Include="DataModel\TweetItem.cs" />
     <Compile Include="DataModel\TwitterDataCommon.cs" />

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using LinqToTwitter;
 using Twittelytics.Common;
+using Twittelytics.Data;
 using Twittelytics.DataModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -25,7 +26,7 @@ namespace Twittelytics
     public sealed partial class SendUpdate : Twittelytics.Common.LayoutAwarePage
     {
         PinAuthorizer _auth;
-        TweetItem _inReplyToStatusID;
+        TweetItem _inReplyToStatus;
 
         public SendUpdate()
         {
@@ -43,10 +44,10 @@ namespace Twittelytics
         /// session.  This will be null the first time a page is visited.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
-            _inReplyToStatusID = navigationParameter != null ? navigationParameter as TweetItem : null;
-            if (_inReplyToStatusID != null)
+            _inReplyToStatus = navigationParameter != null ? navigationParameter as TweetItem : null;
+            if (_inReplyToStatus != null)
             {
-                updateText.Text = "@" + _inReplyToStatusID.Subtitle;
+                updateText.Text = "@" + _inReplyToStatus.Subtitle;
             }
         }
 
@@ -78,30 +79,12 @@ namespace Twittelytics
 
         private void sendUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SuspensionManager.SessionState.ContainsKey("Authorizer"))
+            Status tweet = TwitterDataSource.SendUpdate(updateText.Text, _inReplyToStatus);
+            if (tweet != null && !string.IsNullOrEmpty(tweet.StatusID))
             {
-                _auth = SuspensionManager.SessionState["Authorizer"] as PinAuthorizer;
-                if (_auth != null)
-                {
-                    using (var twitterCtx = new TwitterContext(_auth))
-                    {
-                        Status tweet = null;
-                        if (_inReplyToStatusID != null)
-                        {
-                            tweet = twitterCtx.UpdateStatus(updateText.Text, true, _inReplyToStatusID.UniqueId);
-                        }
-                        else
-                        {
-                            tweet = twitterCtx.UpdateStatus(updateText.Text, true);
-                        }
-                        if (tweet!=null && !string.IsNullOrEmpty(tweet.StatusID))
-                        {
-                            updateText.Text = string.Empty;
-                            statusText.Text = "Tweet Sent Successfully";
-                        }
-                    }
-                }
+                statusText.Text = string.Empty;
             }
+
         }
 
     }

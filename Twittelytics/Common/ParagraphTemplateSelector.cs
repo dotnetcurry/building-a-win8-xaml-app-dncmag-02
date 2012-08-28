@@ -15,7 +15,8 @@ namespace Twittelytics.Common
         public DataTemplate DefaultTemplate { get; set; }
 
         
-        protected override Windows.UI.Xaml.DataTemplate SelectTemplateCore(object item, Windows.UI.Xaml.DependencyObject container)
+        protected override DataTemplate SelectTemplateCore(
+            object item, DependencyObject container)
         {
             if (((ListViewItem)container).ContentTemplate == null)
             {
@@ -90,6 +91,5 @@ namespace Twittelytics.Common
             container.AppendLine("</InlineUIContainer>");
             return container.ToString();
         }
-
     }
 }

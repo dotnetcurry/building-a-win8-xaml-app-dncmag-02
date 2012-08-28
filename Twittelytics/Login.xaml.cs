@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using LinqToTwitter;
 using Twittelytics.Common;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -49,13 +41,14 @@ namespace Twittelytics
             {
                 Credentials = new InMemoryCredentials
                 {
-                    ConsumerKey = "f3AsSTIvM8JkQji4eM74A",
-                    ConsumerSecret = "Ahxwgbg9Su5Xbc6uFeRvkHxWhwNBqXXGcuof1U2XN4"
+                    ConsumerKey = "",
+                    ConsumerSecret = ""
                 },
                 UseCompression = true, 
                 GoToTwitterAuthorization = pageLink =>
                     Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                        () => OAuthWebBrowser.Navigate(new Uri(pageLink, UriKind.Absolute))).AsTask().Wait()
+                        () => OAuthWebBrowser.Navigate(
+                            new Uri(pageLink, UriKind.Absolute))).AsTask().Wait()
             };
 
             auth.BeginAuthorize(resp =>
@@ -67,7 +60,8 @@ namespace Twittelytics
                             break;
                         case TwitterErrorStatus.RequestProcessingException:
                         case TwitterErrorStatus.TwitterApiError:
-                            new MessageDialog(resp.Error.ToString(), resp.Message).ShowAsync().AsTask().Wait();
+                            new MessageDialog(resp.Error.ToString(), 
+                                resp.Message).ShowAsync().AsTask().Wait();
                             break;
                     }
                 }).AsTask().Wait());
@@ -111,7 +105,8 @@ namespace Twittelytics
                             break;
                         case TwitterErrorStatus.RequestProcessingException:
                         case TwitterErrorStatus.TwitterApiError:
-                            new MessageDialog(completeResp.Error.ToString(), completeResp.Message).ShowAsync().AsTask().Wait();
+                            new MessageDialog(completeResp.Error.ToString(), 
+                                completeResp.Message).ShowAsync().AsTask().Wait();
                             break;
                     }
                 }).AsTask().Wait());

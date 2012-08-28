@@ -102,12 +102,10 @@ namespace Twittelytics
                                  select usr).ToList();
 
                     userIdText.Text = users[0].ScreenName;
-                    userName.Text = users[0].Name;
+                    userNameText.Text = users[0].Name;
                     var sampleDataGroups = TwitterDataSource.GetGroups(navigationParameter);
                     userImage.Source = TwitterDataSource.GetCurrentUser().Image;
                     this.DefaultViewModel["Items"] = sampleDataGroups;
-                    //CreateCollage();
-
                 }
                 else
                 {
@@ -115,9 +113,8 @@ namespace Twittelytics
                     var sampleDataGroups = TwitterDataSource.GetGroups(navigationParameter);
                     userImage.Source = null;
                     userIdText.Text = "";
-                    userName.Text = "Log in";
+                    userNameText.Text = "Log in";
                     this.DefaultViewModel["Items"] = sampleDataGroups;
-                    //CreateCollage();
                 }
             }
             catch (NullReferenceException ex)
@@ -205,6 +202,30 @@ namespace Twittelytics
         private void userName_Tapped(object sender, TappedRoutedEventArgs e)
         {
             NavigateToLogin();
+        }
+
+        private void NewTweet_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (!SuspensionManager.SessionState.ContainsKey("Authorizer") ||
+                    SuspensionManager.SessionState["Authorizer"] == null)
+            {
+                Authenticate();
+                BindUserData("AllGroups");
+            }
+            else
+            {
+                NavigateToNew();
+            }
+        }
+
+        private void NavigateToNew()
+        {
+            this.Frame.Navigate(typeof(SendUpdate), null);
+        }
+
+        private void Refresh_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            TwitterDataSource.RefreshAll();
         }
 
     }

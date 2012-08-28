@@ -1,11 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="using:Twittelytics.Common" >
+
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="StandardStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
     <!-- Grid-appropriate 250 pixel square item template as seen in the GroupedItemsPage and ItemsPage -->
     <DataTemplate x:Key="Custom250x250ItemTemplate">
         <Grid HorizontalAlignment="Left" Width="250" Height="250">
@@ -23,6 +24,9 @@
 
     <DataTemplate x:Key="Custom130ItemTemplate">
         <Grid Margin="3">
+            <Grid.Resources>
+                <common:StringFormatConverter x:Key="StringFormatConverter" />
+            </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -31,10 +35,10 @@
                 <Image Source="{Binding Image}" Stretch="UniformToFill"/>
             </Border>
             <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="0,0,0,0">
-                <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="@" Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
-                    <TextBlock Text="{Binding  Subtitle}" Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
+                    <TextBlock Text="{Binding Title}"  Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap"/>
+                    <TextBlock Text="{Binding  Subtitle, Converter={StaticResource StringFormatConverter}, ConverterParameter=' @{0}'}"
+                               Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
                 </StackPanel>
                 <TextBlock Text="{Binding Description}" Style="{StaticResource BodyTextStyle}" />
             </StackPanel>
@@ -47,18 +51,22 @@
     -->
     <DataTemplate x:Key="Custom80ItemTemplate">
         <Grid Margin="3">
+            <Grid.Resources>
+                <common:StringFormatConverter x:Key="StringFormatConverter" />
+            </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Background="{StaticResource ListViewItemPlaceholderBackgroundThemeBrush}" Width="48" Height="48" VerticalAlignment="Top" Margin="2,2">
+            <Border Background="{StaticResource ListViewItemPlaceholderBackgroundThemeBrush}" 
+                    Width="48" Height="48" VerticalAlignment="Top" Margin="2,2">
                 <Image Source="{Binding Image}" Stretch="UniformToFill"/>
             </Border>
             <StackPanel Grid.Column="1" Height="Auto" Margin="0,0,0,0">
-                <TextBlock Text="{Binding Title}" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="@" Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
-                    <TextBlock Text="{Binding  Subtitle}" Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
+                    <TextBlock Text="{Binding Title}"  Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap"/>
+                    <TextBlock Text="{Binding  Subtitle, Converter={StaticResource StringFormatConverter}, ConverterParameter=' @{0}'}"
+                               Style="{StaticResource CustomTwitterUserTextStyle}" TextWrapping="NoWrap"/>
                 </StackPanel>
                 <TextBlock Text="{Binding Description}" Style="{StaticResource CustomTweetTextStyle}" />
             </StackPanel>

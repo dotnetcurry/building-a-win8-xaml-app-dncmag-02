@@ -9,22 +9,22 @@ using Windows.UI.Xaml.Documents;
 
 namespace Twittelytics.Common
 {
-    public class TweetConverter: IValueConverter
+    public class StringFormatConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            RichTextBlock block = new RichTextBlock();
-            Paragraph p = new Paragraph();
-            Run r= new Run();
-            r.Text = "This is a Test";
-            p.Inlines.Add(r);
-            block.Blocks.Add(p);
-            return r.Text;
+            // No format provided.
+            if (parameter == null)
+            {
+                return value;
+            }
+
+            return String.Format((String)parameter, value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            throw new NotImplementedException();
+            return value;
         }
     }
 }

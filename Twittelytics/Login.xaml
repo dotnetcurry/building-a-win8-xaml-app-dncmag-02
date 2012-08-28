@@ -42,7 +42,7 @@
         	<Run FontSize="19" Text="Please provide your Twitter Username and Password and click on Authorize. Enter the PIN that come up, below and tap on Authorize"/>
         </TextBlock>
         <TextBox x:Name="PinTextBox" Margin="120,0,498,84" Grid.Row="3" TextWrapping="Wrap" Height="38" VerticalAlignment="Bottom"/>
-        <Button x:Name="AuthenticatePinButton" Content="Authorize" HorizontalAlignment="Right" Margin="0,0,126,84" Grid.Row="3" VerticalAlignment="Bottom" Click="AuthenticatePinButton_Click" Height="38" Width="367"/>
+        <Button x:Name="AuthenticatePinButton" Content="Authorize" HorizontalAlignment="Right" Margin="0,0,126,84" Grid.Row="3" VerticalAlignment="Bottom" Height="38" Width="367"/>
 
         <VisualStateManager.VisualStateGroups>
 

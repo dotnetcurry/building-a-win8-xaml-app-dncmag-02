@@ -11,6 +11,7 @@ using Twittelytics.DataModel;
 using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
+using Windows.System.Threading;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -45,8 +46,6 @@ namespace Twittelytics.Data
                 {
                     _sampleDataSource.InitGroups();
                 }
-                return this._allGroups;
-
                 return _sampleDataSource._allGroups;
             }
         }
@@ -181,7 +180,11 @@ namespace Twittelytics.Data
                             );
                         if (tweets.Count<TweetItem>() > 0)
                         {
-                            IEnumerable<TweetItem> results = matches.Items.Union<TweetItem>(tweets, new UniqueIdCompararer()).OrderByDescending<TweetItem, string>(k => k.UniqueId);//.ToList<TweetItem>();
+                            IEnumerable<TweetItem> results = 
+                                matches.Items.Union<TweetItem>(tweets, 
+                                    new UniqueIdCompararer()).OrderByDescending
+                                        <TweetItem, string>
+                                            (k => k.UniqueId);
                             matches.Items.Clear();
                             foreach (var item in results)
                             {
@@ -216,6 +219,30 @@ namespace Twittelytics.Data
             }
         }
 
+        internal static Status SendUpdate(string updateText, TweetItem inRepyTo)
+        {
+            if (_sampleDataSource._auth == null)
+            {
+                _sampleDataSource.InitGroups();
+            }
+            using (var twitterCtx = new TwitterContext(_sampleDataSource._auth))
+            {
+                Status tweet = null;
+                if (inRepyTo != null)
+                {
+                    tweet = twitterCtx.UpdateStatus(updateText, true, inRepyTo.UniqueId);
+                }
+                else
+                {
+                    tweet = twitterCtx.UpdateStatus(updateText, true);
+                }
+                if (tweet != null && !string.IsNullOrEmpty(tweet.StatusID))
+                {
+                    updateText = string.Empty;
+                }
+                return tweet;
+            }
+        }
         internal static void Favorite(TweetItem selectedItem)
         {
             if (_sampleDataSource._auth == null)
@@ -262,18 +289,12 @@ namespace Twittelytics.Data
                             {
                                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fileStream);
                                 BitmapFrame frame = await decoder.GetFrameAsync(0);
-
-                                // I know the parameterless version of GetPixelDataAsync works for this image
                                 PixelDataProvider pixelProvider = await frame.GetPixelDataAsync();
                                 srcPixels = pixelProvider.DetachPixelData();
-
-                                // Create the WriteableBitmap
                                 wid = (int)frame.PixelWidth;
                                 hgt = (int)frame.PixelHeight;
                                 bitmap = new WriteableBitmap(wid, hgt);
                             }
-
-                            //// Set the bitmap to the Image element
                             Stream pixelStream1 = bitmap.PixelBuffer.AsStream();
 
                             pixelStream1.Seek(0, SeekOrigin.Begin);
@@ -303,6 +324,10 @@ namespace Twittelytics.Data
             }
         }
 
+        public static void RefreshAll()
+        {
+            _sampleDataSource.Refresh();
+        }
 
         internal void Refresh()
         {
@@ -311,16 +336,20 @@ namespace Twittelytics.Data
             {
                 dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
                 {
-                    var matches = _sampleDataSource.AllGroups.Where((group) => group.UniqueId.Equals(item.UniqueId)).ToList<TwitterList>();
+                    var matches = _sampleDataSource.AllGroups.Where(
+                        (group) => 
+                            group.UniqueId.Equals(item.UniqueId)).ToList<TwitterList>();
                     if (matches.Count > 0)
                     {
                         if (item.UniqueId == "timeline")
                         {
-                            _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Home);
+                            _sampleDataSource.RefreshTimeLine(matches.First(), 
+                                StatusType.Home);
                         }
                         else if (item.UniqueId == "atMentions")
                         {
-                            _sampleDataSource.RefreshTimeLine(matches.First(), StatusType.Mentions);
+                            _sampleDataSource.RefreshTimeLine(matches.First(), 
+                                StatusType.Mentions);
                         }
                     }
                 });
@@ -329,12 +358,6 @@ namespace Twittelytics.Data
             {
                 _timer.Start();
             }
-
-            //foreach (var item in _sampleDataSource.AllGroups)
-            //{
-
-            //}
-
         }
     }
 }
