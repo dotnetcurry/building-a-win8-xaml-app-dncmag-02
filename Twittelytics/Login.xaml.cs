@@ -41,8 +41,8 @@ namespace Twittelytics
             {
                 Credentials = new InMemoryCredentials
                 {
-                    ConsumerKey = "",
-                    ConsumerSecret = ""
+                    ConsumerKey = "<add your consumer key here>",
+                    ConsumerSecret = "<add your consumer secret here>"
                 },
                 UseCompression = true, 
                 GoToTwitterAuthorization = pageLink =>
